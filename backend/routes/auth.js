@@ -1,0 +1,97 @@
+const express = require("express");
+const authRouter = express.Router();
+const User = require("../models/user");
+const {validateSingupData} = require("../utils/validation");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const { userAuth } = require("../middlewares/auth");
+
+
+
+
+authRouter.post("/signup", async (req, res)=>{
+    try{
+        //validate body data
+        validateSingupData(req);
+
+        
+
+        const {firstName, lastName, emailId, password, gender, age} = req.body;
+
+        
+
+        if(!emailId) return res.status(400).json({ error: 'Email ID is required.' });
+        
+        //checking if onother user with same email id exist 
+        const existingUser = await User.findOne({ emailId  });
+        if (existingUser) {
+            return res.status(409).json({ error: 'Email already exist.' });
+        }
+
+        //encrypt password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // creating a new instance of User 
+        const newUser = new User({
+            firstName, lastName, emailId, password : passwordHash
+        });
+    
+        // await newUser.save();
+        const savedUser = await newUser.save();
+        const token = await savedUser.getJWT();   // this is new i.e singup karne ke time v token creage karna and 
+        // cookie set karna
+
+        res.cookie("token", token, {
+            expires : new Date(Date.now() + 8*3600000),
+        })
+
+        return res.json({message: "user created successfully",  data : newUser  }
+        )
+    }catch(err){
+        console.log("error");
+       return  res.status(404).send("ERROR: " + err.message);
+    }
+})
+
+authRouter.post("/login", async (req, res)=>{
+    try{
+        const {emailId, password} = req.body;
+
+        // finding user with this email and password
+        const user = await User.findOne({emailId});
+        if(!user) throw new Error("invalid Credintials");
+
+        const isValidPassword = bcrypt.compare(password, user.password);
+        if(! isValidPassword) throw new Error("invalid Credintials");
+
+        //since user is found so generate a new token and set in cookies
+        const token = jwt.sign({_id : user._id}, process.env.JWT_SECRET);
+        console.log(token);
+        res.cookie("token", token);
+
+        res.send(user)
+    }catch(err){
+        res.status(400).send("ERROR: " + err);
+    }
+})
+
+authRouter.post("/logout", async (req, res)=>{
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+    })
+
+    res.send("you r logout");
+})
+
+authRouter.get("/auth/check",userAuth,  async (req, res)=>{
+    try{
+        res.status(200).json(req.user);
+    }
+    catch(error){
+        console.log("Error in auth/check", error.message);
+        res.status(500).json({message: "Internal server error"})
+    }
+})
+
+module.exports = authRouter;
