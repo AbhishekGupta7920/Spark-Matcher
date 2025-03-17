@@ -1,97 +1,98 @@
 const express = require("express");
 const authRouter = express.Router();
 const User = require("../models/user");
-const {validateSingupData} = require("../utils/validation");
+const { validateSingupData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { userAuth } = require("../middlewares/auth");
 
-
-
-
-authRouter.post("/signup", async (req, res)=>{
-    try{
-        //validate body data
+authRouter.post("/signup", async (req, res) => {
+    try {
+        // Validate body data
         validateSingupData(req);
 
-        
+        const { firstName, lastName, emailId, password, gender, age } = req.body;
 
-        const {firstName, lastName, emailId, password, gender, age} = req.body;
+        if (!emailId) return res.status(400).json({ error: 'Email ID is required.' });
 
-        
-
-        if(!emailId) return res.status(400).json({ error: 'Email ID is required.' });
-        
-        //checking if onother user with same email id exist 
-        const existingUser = await User.findOne({ emailId  });
+        // Check if another user with the same email ID exists
+        const existingUser = await User.findOne({ emailId });
         if (existingUser) {
-            return res.status(409).json({ error: 'Email already exist.' });
+            return res.status(409).json({ error: 'Email already exists.' });
         }
 
-        //encrypt password
+        // Encrypt password
         const passwordHash = await bcrypt.hash(password, 10);
 
-        // creating a new instance of User 
+        // Create a new instance of User
         const newUser = new User({
-            firstName, lastName, emailId, password : passwordHash
+            firstName, lastName, emailId, password: passwordHash,
         });
-    
-        // await newUser.save();
+
+        // Save the user
         const savedUser = await newUser.save();
-        const token = await savedUser.getJWT();   // this is new i.e singup karne ke time v token creage karna and 
-        // cookie set karna
+        const token = await savedUser.getJWT(); // Generate token
 
+        // Set token in cookies
         res.cookie("token", token, {
-            expires : new Date(Date.now() + 8*3600000),
-        })
+            httpOnly: true, // Prevent client-side access
+            secure: true, // Use 'true' in production (HTTPS)
+            sameSite: "none", // Required for cross-origin requests
+            maxAge: 8 * 3600000, // 8 hours
+        });
 
-        return res.json({message: "user created successfully",  data : newUser  }
-        )
-    }catch(err){
+        return res.json({ message: "User created successfully", data: newUser });
+    } catch (err) {
         console.log("error");
-       return  res.status(404).send("ERROR: " + err.message);
+        return res.status(404).send("ERROR: " + err.message);
     }
-})
+});
 
-authRouter.post("/login", async (req, res)=>{
-    try{
-        const {emailId, password} = req.body;
+authRouter.post("/login", async (req, res) => {
+    try {
+        const { emailId, password } = req.body;
 
-        // finding user with this email and password
-        const user = await User.findOne({emailId});
-        if(!user) throw new Error("invalid Credintials");
+        // Finding user with this email and password
+        const user = await User.findOne({ emailId });
+        if (!user) throw new Error("Invalid Credentials");
 
-        const isValidPassword = bcrypt.compare(password, user.password);
-        if(! isValidPassword) throw new Error("invalid Credintials");
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) throw new Error("Invalid Credentials");
 
-        //since user is found so generate a new token and set in cookies
-        const token = jwt.sign({_id : user._id}, process.env.JWT_SECRET);
-        console.log(token);
-        res.cookie("token", token);
+        // Generate a new token and set in cookies
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+        res.cookie("token", token, {
+            httpOnly: true, // Prevent client-side access
+            secure: true, // Use 'true' in production (HTTPS)
+            sameSite: "none", // Required for cross-origin requests
+            maxAge: 8 * 3600000, // 8 hours
+        });
 
-        res.send(user)
-    }catch(err){
-        res.status(400).send("ERROR: " + err);
+        res.send(user);
+    } catch (err) {
+        res.status(400).send("ERROR: " + err.message);
     }
-})
+});
 
-authRouter.post("/logout", async (req, res)=>{
+authRouter.post("/logout", async (req, res) => {
     res.cookie("token", null, {
         expires: new Date(Date.now()),
-    })
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+    });
 
-    res.send("you r logout");
-})
+    res.send("You are logged out");
+});
 
-authRouter.get("/auth/check",userAuth,  async (req, res)=>{
-    try{
+authRouter.get("/auth/check", userAuth, async (req, res) => {
+    try {
         res.status(200).json(req.user);
-    }
-    catch(error){
+    } catch (error) {
         console.log("Error in auth/check", error.message);
-        res.status(500).json({message: "Internal server error"})
+        res.status(500).json({ message: "Internal server error" });
     }
-})
+});
 
 module.exports = authRouter;
