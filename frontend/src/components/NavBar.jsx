@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
 import { removeUser } from '../utils/userSlice';
 import { useAuthStore } from '../store/useAuthStore';
+import logo from '../assets/logo.jpg';
+
 
 
 
@@ -33,7 +35,10 @@ const NavBar = () => {
       {/* <div className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 
     backdrop-blur-lg bg-base-100/80"> */}
         <div className="flex-1">
-          <Link to="/" className="btn btn-ghost text-xl">SparkMatcher</Link>
+          <Link to="/" className="btn btn-ghost text-xl">
+            <img className='w-[40px]' src={logo} alt="logo image" />
+            <h3>SparkMathcer</h3>
+          </Link>
         </div>
         {user && 
           <div className="flex-none gap-2">
