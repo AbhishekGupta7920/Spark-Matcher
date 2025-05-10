@@ -42,7 +42,7 @@ const NavBar = () => {
         </div>
         {user && 
           <div className="flex-none gap-2">
-            <div>Welcome, {user.firstName}</div>
+{/*             <div>Welcome, {user.firstName}</div> */}
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">
