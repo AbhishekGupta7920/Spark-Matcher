@@ -93,26 +93,31 @@
 
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/conectionSlice";
 import { useNavigate } from "react-router-dom";
 import { useChatStore } from "../store/useChatStore";
+import LoadingSpinner from './LoadingSpinner';
 
 const Connections = () => {
   const navigate = useNavigate();
   const connections = useSelector((store) => store.connections);
   const dispatch = useDispatch();
   const { selectedUser, setSelectedUser } = useChatStore();
+  const [loading, setLoading] = useState(true);
 
   const fetchConnections = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
       dispatch(addConnections(res.data.connectionsInfo));
     } catch (err) {
       console.error("Error fetching connections:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,7 +125,9 @@ const Connections = () => {
     fetchConnections();
   }, []);
 
-  if (connections === null)
+  if (loading) return <LoadingSpinner message="Loading your connections..." />;
+
+  if (connections === null || connections.length === 0)
     return (
       <h1 className="flex justify-center items-center min-h-screen pb-10 text-2xl">
         You have no connections yet

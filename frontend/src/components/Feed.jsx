@@ -6,6 +6,7 @@ import { addFeed } from '../utils/feedSlice';
 import UserCard from './UserCard';
 import { useSwipeable } from 'react-swipeable';
 import {useNavigate} from "react-router-dom";
+import LoadingSpinner from './LoadingSpinner';
 import './Feed.css';
 
 const Feed = () => {
@@ -13,14 +14,18 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const user = useSelector((store) => store.user);
   const [index, setIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const getFeed = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(BASE_URL + '/feed', { withCredentials: true });
       dispatch(addFeed(res?.data?.data));
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,10 +50,8 @@ const Feed = () => {
 
   if (!user)
       return navigate("/login-page")
-    // <div className='flex justify-center items-center h-screen text-xl'>
-    //   Please login to view feed
-    // </div> 
 
+  if (loading) return <LoadingSpinner message="Finding new users for you..." />;
   
   if (!feed || feed.length === 0) return (
     <div className='flex justify-center items-center h-screen text-xl'>
