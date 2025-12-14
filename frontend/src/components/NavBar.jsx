@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../utils/constants';
 import { removeUser } from '../utils/userSlice';
@@ -13,26 +13,26 @@ import logo from '../assets/logo.jpg';
 const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((store)=> store.user);
+  const user = useSelector((store) => store.user);
   // console.log(user);
-  const {disconnectSocket} = useAuthStore();
+  const { disconnectSocket } = useAuthStore();
 
-  const handleLogout = async ()=>{
-    try{
-      const res = await axios.post(BASE_URL + "/logout",  {}, {withCredentials : true});
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       console.log(res);
       disconnectSocket();
       dispatch(removeUser());
       return navigate("/login-page");
     }
-    catch(err){
+    catch (err) {
       console.log(err.message);
     }
   }
   return (
     <div>
       <div className="navbar bg-base-300">
-      {/* <div className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 
+        {/* <div className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 
     backdrop-blur-lg bg-base-100/80"> */}
         <div className="flex-1">
           <Link to="/" className="btn btn-ghost text-xl">
@@ -40,12 +40,12 @@ const NavBar = () => {
             <h3>SparkMatcher</h3>
           </Link>
         </div>
-        {user && 
+        {user &&
           <div className="flex-none gap-2">
-{/*             <div>Welcome, {user.firstName}</div> */}
+            <div>Welcome {user.firstName}</div>
             <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                <div className="w-10 rounded-full">
+              <div tabIndex={0} role="button" className="mr-4 btn btn-ghost btn-circle avatar">
+                <div className="w-12 rounded-full">
                   <img
                     alt="Tailwind CSS Navbar component"
                     src={user.photoUrl} />
@@ -64,17 +64,17 @@ const NavBar = () => {
                   <Link to="/settings">Settings</Link>
 
                   <a onClick={handleLogout} className='hover:cursor-pointer'>Logout</a>
-                  
+
                 </li>
               </ul>
             </div>
           </div>
         }
         {!user &&
-            <div className='flex gap-2'>
-              <Link to="/signup">Sing up</Link>
-              <Link to="/login-page" >Log in</Link>
-            </div>
+          <div className='flex gap-2'>
+            <Link to="/signup">Sing up</Link>
+            <Link to="/login-page" >Log in</Link>
+          </div>
         }
       </div>
     </div>
