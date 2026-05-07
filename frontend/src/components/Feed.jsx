@@ -61,7 +61,7 @@ const Feed = () => {
 
   return (
     <section
-      className="feed-container relative mx-auto flex w-full max-w-7xl items-center justify-center px-4 py-8 sm:py-12"
+      className="feed-container relative mx-auto flex w-full max-w-7xl items-center justify-center px-4 py-8 sm:py-0"
       {...handlers}
     >
       {/* Desktop: 5-card stacked layout */}

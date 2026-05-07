@@ -6,11 +6,11 @@ import { BASE_URL } from '../utils/constants';
 const sizes = {
   active:
     'w-[300px] sm:w-[320px] md:w-[340px] lg:w-[360px] xl:w-[380px] ' +
-    'h-[560px] md:h-[600px] lg:h-[640px] xl:h-[660px]',
+    'h-[calc(100vh-120px)] sm:h-[calc(100vh-120px)] md:h-[calc(100vh-100px)] lg:h-[calc(100vh-90px)] xl:h-[calc(100vh-90px)] max-h-[670px]',
   near:
     'w-[280px] lg:w-[300px] xl:w-[320px] ' +
-    'h-[500px] lg:h-[540px] xl:h-[560px]',
-  far: 'w-[260px] lg:w-[280px] h-[440px] lg:h-[470px]',
+    'h-[calc(100vh-160px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-140px)] lg:h-[calc(100vh-130px)] xl:h-[calc(100vh-130px)] max-h-[600px]',
+  far: 'w-[260px] lg:w-[280px] h-[calc(100vh-200px)] sm:h-[calc(100vh-200px)] md:h-[calc(100vh-180px)] lg:h-[calc(100vh-170px)] xl:h-[calc(100vh-170px)] max-h-[520px]',
 };
 
 const imageHeights = {
