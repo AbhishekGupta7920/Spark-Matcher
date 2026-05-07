@@ -42,10 +42,10 @@ const NavBar = () => {
         </div>
         {user &&
           <div className="flex-none gap-2">
-            <div>Welcome {user.firstName}</div>
+            {/* <div>Welcome {user.firstName}</div> */}
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="mr-4 btn btn-ghost btn-circle avatar">
-                <div className="w-12 rounded-full">
+                <div className="w-8 rounded-full">
                   <img
                     alt="Tailwind CSS Navbar component"
                     src={user.photoUrl} />
@@ -59,6 +59,7 @@ const NavBar = () => {
                     Profile
                     <span className="badge">New</span>
                   </Link>
+                  <Link to="/">Home</Link>
                   <Link to="/connections">Connections</Link>
                   <Link to="/requests">Requests</Link>
                   <Link to="/settings">Settings</Link>
@@ -72,7 +73,7 @@ const NavBar = () => {
         }
         {!user &&
           <div className='flex gap-2'>
-            <Link to="/signup">Sing up</Link>
+            <Link to="/signup">Sign up</Link>
             <Link to="/login-page" >Log in</Link>
           </div>
         }

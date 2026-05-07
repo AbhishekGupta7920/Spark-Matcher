@@ -96,8 +96,8 @@ import { BASE_URL } from '../utils/constants';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [emailId, setEmailId] = useState("elon@gmail.com");
-  const [password, setPassword] = useState("Elon@123");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -106,33 +106,35 @@ const LoginPage = () => {
 
   const isLoggingIn = false;
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const loginWithCredentials = async (email, pass) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/login",
+        { emailId: email, password: pass },
+        { withCredentials: true }
+      );
+      setAuthUser(res.data);
+      connectSocket();
+      dispatch(addUser(res.data));
+      navigate("/");
+    } catch (err) {
+      const errorMessage = err?.response?.data || "Invalid credentials.";
+      toast.error(errorMessage);
+      setError(errorMessage);
+    }
+  };
 
-    console.log(emailId, password)
-      try {
-          const res = await axios.post(
-            BASE_URL + "/login",
-              {
-                  emailId,
-                  password
-              },
-              {
-                  withCredentials: true
-              }
-          );
-          console.log('Login Success:', res.data);
-          setAuthUser(res.data);  // save user in auth store for future use.
-          connectSocket();
-          dispatch(addUser(res.data));
-          return navigate("/");
-      }
-      catch (err) {
-          console.log('Login Error:', err);
-          const errorMessage = err?.response?.data || "Invalid credentials. Please check your email and password.";
-          toast.error(errorMessage);
-          setError(errorMessage);
-      }
+  // normal login
+  const handleLogin = (e) => {
+    e.preventDefault();
+    loginWithCredentials(emailId, password);
+  };
+
+  // guest login
+  const handleGuestLogin = () => {
+    setEmailId("guest@demo.com");
+    setPassword("Guest@123");
+    loginWithCredentials("guest@demo.com", "Guest@123");
   };
 
   return (
@@ -213,6 +215,10 @@ const LoginPage = () => {
                 "Sign in"
               )}
             </button>
+
+            <p onClick={handleGuestLogin} type="submit" className="link link-primary" disabled={isLoggingIn}>
+              Login as Guest
+            </p>
           </form>
 
           <div className="text-center">
