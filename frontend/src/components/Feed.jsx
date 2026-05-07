@@ -48,7 +48,7 @@ const Feed = () => {
     trackMouse: true,
   });
 
-  if (!user) return navigate('/login-page');
+  if (!user) return navigate('/login');
   if (loading) return <LoadingSpinner message="Finding new users for you..." />;
   if (!feed || feed.length === 0)
     return (

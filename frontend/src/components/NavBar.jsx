@@ -23,7 +23,7 @@ const NavBar = () => {
       console.log(res);
       disconnectSocket();
       dispatch(removeUser());
-      return navigate("/login-page");
+      return navigate("/login");
     }
     catch (err) {
       console.log(err.message);
@@ -74,7 +74,7 @@ const NavBar = () => {
         {!user &&
           <div className='flex gap-2'>
             <Link to="/signup">Sign up</Link>
-            <Link to="/login-page" >Log in</Link>
+            <Link to="/login" >Log in</Link>
           </div>
         }
       </div>
