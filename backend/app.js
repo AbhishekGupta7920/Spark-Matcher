@@ -119,7 +119,7 @@ const { userAuth } = require("./middlewares/auth");
 // Allowed origins for CORS
 const allowedOrigins = [
     "http://localhost:5173", // For local development
-    "https://spark-matcher.onrender.com", // For production
+    "https://spark-matcher.vercel.app", // For production
 ];
 
 // Consolidated CORS configuration
