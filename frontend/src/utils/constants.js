@@ -1,5 +1,5 @@
 // export const BASE_URL = process.env.VITE_API_URL || "http://localhost:7777";
-export const BASE_URL = "https://spark-matcher-production.up.railway.app";
+export const BASE_URL = "https://spark-matcher.up.railway.app";
 
 export const THEMES = [
     "light",
